@@ -9,7 +9,7 @@
 :root{--bg:#fbf6ec;--panel:#fffdf8;--ink:#34251f;--muted:#806f63;--accent:#8b3d25;--gold:#c18a32;--line:#eadcc8;--soft:#f5ead8;--shadow:0 8px 26px #4b2c1710}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Devanagari","Mangal",system-ui,sans-serif}
 header{background:linear-gradient(115deg,#6e2b20,#9c4b29);color:#fff;padding:22px max(18px,calc((100% - 1120px)/2));}
-.brand{display:flex;align-items:center;gap:14px}.logo{width:52px;height:52px;border:1px solid #e8c88b;border-radius:16px;display:grid;place-items:center;font-size:27px;background:#ffffff12}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:52px;height:52px;min-width:52px;flex:none;border:1px solid #e8c88b;border-radius:16px;display:grid;place-items:center;font-size:25px;line-height:1;white-space:nowrap;overflow:hidden;background:#ffffff12}
 h1{font-size:clamp(23px,4vw,32px);margin:0}.tag{font-size:13px;color:#f6dfc1;margin-top:4px}
 main{max-width:1120px;margin:26px auto;padding:0 18px}.welcome{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:20px}.welcome h2{margin:0 0 5px;font-size:23px}.welcome p{margin:0;color:var(--muted);font-size:14px}
 .badge{background:#f0dfc4;color:#70401f;border:1px solid #e2c99f;padding:8px 12px;border-radius:99px;font-size:12px;white-space:nowrap}
@@ -25,7 +25,7 @@ body.dark{--bg:#191512;--panel:#27211c;--ink:#f4eadc;--muted:#c0ad9b;--line:#493
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">॥ ॐ ॥</div><div><h1>विवाह विधानम्</h1><div class="tag">सम्पूर्ण विवाह संस्कार संचालन प्रणाली · डिजिटल आचार्य सहायक</div><div style="margin-top:9px;font-size:15px;font-weight:700;color:#ffe5b8;letter-spacing:.2px">PANDIT AKHILESH OJHA &nbsp; | &nbsp; M-9227132167</div></div></div></header>
+<header><div class="brand"><div class="logo" aria-label="ॐ">ॐ</div><div><h1>विवाह विधानम्</h1><div class="tag">सम्पूर्ण विवाह संस्कार संचालन प्रणाली · डिजिटल आचार्य सहायक</div><div style="margin-top:9px;font-size:15px;font-weight:700;color:#ffe5b8;letter-spacing:.2px">PANDIT AKHILESH OJHA &nbsp; | &nbsp; M-9227132167</div></div></div></header>
 <main>
 <div id="home">
  <div class="welcome"><div><h2>आचार्य जी, आपका स्वागत है</h2><p>पुस्तक-आधारित पूर्ण विधि को चरणबद्ध रूप से संचालित करें।</p></div><span class="badge">आधार ग्रंथ: सरल विवाह संस्कार पद्धति</span></div>
