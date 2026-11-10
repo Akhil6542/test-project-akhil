@@ -87,6 +87,17 @@ body.dark .acharya-toolbar select{background:var(--panel);color:var(--ink);borde
 .helper-empty{padding:14px;background:var(--soft);border-radius:10px;line-height:1.7}
 body.dark .helper-toolbar select{background:var(--panel);color:var(--ink);border-color:var(--line)}
 
+
+.material-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.material-toolbar select,.material-toolbar input{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit;min-width:min(100%,280px)}
+.material-group{border:1px solid var(--line);background:var(--panel);border-radius:14px;margin:12px 0;overflow:hidden}
+.material-group h3{margin:0;padding:13px 15px;background:var(--soft);font-size:16px}
+.material-row{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-bottom:1px solid var(--line);line-height:1.65}
+.material-row:last-child{border-bottom:0}.material-row input{margin-top:6px;accent-color:var(--accent)}
+.material-ref{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.material-summary{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--soft);line-height:1.7}
+body.dark .material-toolbar select,body.dark .material-toolbar input{background:var(--panel);color:var(--ink);border-color:var(--line)}
+
 </style>
 </head>
 <body>
@@ -522,6 +533,43 @@ function renderHelper(){
 function changeHelperRitual(v){window.helperRitualIndex=Number(v)||0;renderHelper()}
 function helperToggle(key,checked){const a=helperRead();if(checked)a[key]=true;else delete a[key];helperWrite(a);renderHelper()}
 
+
+const materialTerms = [
+ "आम्रपल्लव","पवित्री (पैती)","ताम्र-पात्र","काँस्य-पात्र","प्रणीता-पात्र","फलदान सामग्री","रक्षा-दीप","समिधा","कुशा","अक्षत","पुष्प","शुद्ध जल","जल","आसन","पीढ़ा","दीप","घृत","फल","तिल","जौ","दूर्वा","चन्दन","रोली","माला","जनेऊ","कलश","नारियल","पान","सुपारी","धूप","नैवेद्य","लाज/लावा","सिन्दूर","अग्नि"
+];
+function materialRead(){try{return JSON.parse(localStorage.getItem('vv_material_check_v1')||'{}')}catch(e){return {}}}
+function materialWrite(v){localStorage.setItem('vv_material_check_v1',JSON.stringify(v))}
+function materialEscape(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function getRitualMaterials(r){
+ const found=new Map();
+ (r.steps||[]).forEach((st,si)=>{
+   const source=[st.title||'',st.body||'',...(st.tasks||[]),...(st.tasksExtra||[])].join(' ');
+   materialTerms.forEach(term=>{if(source.includes(term)){if(!found.has(term))found.set(term,[]);found.get(term).push(st.title||`चरण ${si+1}`)}});
+ });
+ return [...found.entries()].map(([name,refs])=>({name,refs:[...new Set(refs)]}));
+}
+function renderMaterials(){
+ const root=document.getElementById('modeContent');
+ const idx=window.materialRitualIndex===undefined?0:window.materialRitualIndex;
+ const saved=materialRead();
+ const selected=liveRituals[idx];
+ let all=0,done=0,html=`<div class="material-toolbar"><label for="materialRitualSelect"><b>संस्कार चुनें:</b></label><select id="materialRitualSelect" onchange="changeMaterialRitual(this.value)"><option value="-1" ${idx===-1?'selected':''}>सभी संस्कार</option>${liveRituals.map((r,i)=>`<option value="${i}" ${i===idx?'selected':''}>${i+1}. ${materialEscape(r.name)}</option>`).join('')}</select><button class="secondary" type="button" onclick="showAllMaterials()">सभी संस्कार</button></div>`;
+ html+=`<p class="hint">सूची चुने हुए संस्कार के चरणों में स्पष्ट रूप से उल्लिखित वस्तुओं से बनाई गई है। हर वस्तु के साथ संबंधित चरण भी दिया गया है। टिक की स्थिति इसी डिवाइस में सुरक्षित रहेगी।</p>`;
+ const groups=idx===-1?liveRituals.map((r,i)=>({r,i,items:getRitualMaterials(r)})):[{r:selected,i:idx,items:getRitualMaterials(selected)}];
+ groups.forEach(g=>{
+   if(!g.items.length){html+=`<section class="material-group"><h3>${materialEscape(g.r.name)}</h3><div class="helper-empty">इस संस्कार के उपलब्ध विवरण में अलग-अलग सामग्री के नाम स्पष्ट रूप से नहीं मिले।</div></section>`;return;}
+   html+=`<section class="material-group"><h3>${materialEscape(g.r.name)}</h3>`;
+   g.items.forEach((item,j)=>{const key=`${g.i}_${item.name}`,checked=!!saved[key];all++;if(checked)done++;html+=`<label class="material-row"><input type="checkbox" ${checked?'checked':''} onchange="materialToggle('${materialEscape(key)}',this.checked)"><span><b>${materialEscape(item.name)}</b><small class="material-ref">संबंधित चरण: ${item.refs.map(materialEscape).join(' • ')}</small></span></label>`});
+   html+='</section>';
+ });
+ html=`<div class="material-summary"><b>सामग्री तैयारी:</b> ${done} / ${all} वस्तुएँ तैयार <div class="progress-wrap"><div class="progress-bar" style="width:${all?Math.round(done/all*100):0}%"></div></div></div>`+html;
+ html+=`<p class="source-note">यह सूची उपलब्ध चरण-विवरण से निकाली गई है; इसे पुस्तक की सम्पूर्ण विवाह-सामग्री की अंतिम सूची न मानें। जो वस्तु इन विवरणों में स्पष्ट रूप से नहीं लिखी है, उसे अनुमान से नहीं जोड़ा गया है।</p>`;
+ root.innerHTML=html;
+}
+function changeMaterialRitual(v){window.materialRitualIndex=Number(v);renderMaterials()}
+function showAllMaterials(){window.materialRitualIndex=-1;renderMaterials()}
+function materialToggle(key,checked){const a=materialRead();if(checked)a[key]=true;else delete a[key];materialWrite(a);renderMaterials()}
+
 function openMode(m){
  let data={live:['Live विवाह संचालन','विवाह को क्रमशः संचालित करें। संस्कार चुनें, वर्तमान चरण पढ़ें, कार्य-विभाजन देखें और पूर्णता दर्ज करें।'],acharya:['आचार्य मोड','मूल संस्कृत मंत्र, हिंदी अर्थ, विनियोग, पूरी विधि और किस व्यक्ति को क्या करना है—सब एक स्क्रीन पर।'],helper:['सहायक मोड','सहायक को केवल तैयारी, सामग्री और अगले कार्य के स्पष्ट निर्देश दिखेंगे।'],materials:['पूजन सामग्री','प्रत्येक संस्कार की अलग सामग्री सूची और पूरी विवाह सामग्री की संयुक्त सूची।'],records:['विवाह रिकॉर्ड','विवाह का नाम/दिनांक और पूर्णता की स्थिति इस डिवाइस पर स्थानीय रूप से सुरक्षित रखने की सुविधा।']}[m];
  document.getElementById('home').style.display='none';
@@ -533,6 +581,7 @@ function openMode(m){
  if(m==='live'){liveRitualIndex=0;liveStepIndex=0;renderLive();}
  else if(m==='acharya'){window.acharyaRitualIndex=0;renderAcharya();}
  else if(m==='helper'){window.helperRitualIndex=0;renderHelper();}
+ else if(m==='materials'){window.materialRitualIndex=0;renderMaterials();}
  else {content.className='placeholder';content.textContent='इस मॉड्यूल की कार्यशील सुविधाएँ अगले चरण में जोड़ी जाएँगी।';}
  window.scrollTo(0,0)
 }
