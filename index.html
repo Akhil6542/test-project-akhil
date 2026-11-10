@@ -65,6 +65,16 @@ body.dark .mantra{background:#30271e;color:#f4eadc}
 .live-done{display:flex;gap:9px;align-items:center;margin:14px 0;font-weight:700}
 body.dark .live-toolbar select{background:var(--panel);color:var(--ink);border-color:var(--line)}
 
+
+.acharya-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.acharya-toolbar select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit;min-width:min(100%,320px)}
+.acharya-step{border:1px solid var(--line);background:var(--panel);border-radius:14px;margin:12px 0;overflow:hidden}
+.acharya-step summary{cursor:pointer;padding:14px 16px;background:var(--soft);font-weight:700}
+.acharya-step-body{padding:15px;line-height:1.8}
+.acharya-step-body h4{margin:14px 0 7px}
+.acharya-step-body ul{padding-left:22px}
+body.dark .acharya-toolbar select{background:var(--panel);color:var(--ink);border-color:var(--line)}
+
 </style>
 </head>
 <body>
@@ -424,6 +434,50 @@ function liveNext(){
  document.getElementById("modeContent").insertAdjacentHTML("beforeend",'<p class="status">सभी उपलब्ध संस्कारों के चरण देख लिए गए हैं।</p>');
 }
 
+
+function renderAcharya(){
+ const root=document.getElementById("modeContent");
+ const idx=window.acharyaRitualIndex||0;
+ const r=liveRituals[idx];
+ if(!r||!r.steps){root.innerHTML="<p>इस संस्कार की विधि उपलब्ध नहीं है।</p>";return}
+ const saved=liveSaved(r);
+ let out=`<div class="acharya-toolbar">
+  <label for="acharyaRitualSelect"><b>संस्कार चुनें:</b></label>
+  <select id="acharyaRitualSelect" onchange="changeAcharyaRitual(this.value)">
+   ${liveRituals.map((x,i)=>`<option value="${i}" ${i===idx?"selected":""}>${i+1}. ${x.name}</option>`).join("")}
+  </select>
+  <span class="status">${saved.length} / ${r.steps.length} चरण पूर्ण</span>
+ </div>
+ <div class="progress-wrap"><div class="progress-bar" style="width:${Math.round(saved.length/r.steps.length*100)}%"></div></div>
+ <p class="hint">इस मोड में चुने हुए संस्कार के उपलब्ध चरण, मंत्र, सरल अर्थ और कार्य-विभाजन एक साथ देख सकते हैं। Live संचालन और आचार्य मोड की पूर्णता एक-दूसरे से जुड़ी है।</p>`;
+ r.steps.forEach((st,i)=>{
+  const done=saved.includes(i);
+  out+=`<details class="acharya-step" ${i===0?"open":""}>
+   <summary>${i+1}. ${st.title||"चरण"} ${done?"✓":""}</summary>
+   <div class="acharya-step-body">
+    <div class="step-meta">${st.kind||"विधि"}</div>
+    ${st.body?`<p>${st.body}</p>`:""}
+    ${st.mantra?`<h4>मंत्र</h4><div class="mantra">${st.mantra}</div>`:""}
+    ${st.meaning?`<h4>सरल अर्थ</h4><p>${st.meaning}</p>`:""}
+    ${st.song?`<h4>${st.songTitle||"मंगलगीत"}</h4><div class="mantra">${st.song}</div>`:""}
+    ${st.vows?`<h4>${st.vowsTitle||"वचन"}</h4><div class="mantra">${st.vows}</div>`:""}
+    ${st.tasks?`<h4>कार्य-विभाजन</h4><ul>${st.tasks.map(t=>`<li>${t}</li>`).join("")}</ul>`:""}
+    ${st.tasksExtra?`<ul>${st.tasksExtra.map(t=>`<li>${t}</li>`).join("")}</ul>`:""}
+    <label class="checkline"><input type="checkbox" ${done?"checked":""} onchange="acharyaToggleStep(${i},this.checked)"><b>यह चरण पूर्ण हुआ</b></label>
+   </div>
+  </details>`;
+ });
+ out+=`<p class="source-note">नोट: इस संस्कार के डेटा में जहाँ सामग्री की अलग सूची उपलब्ध नहीं है, वहाँ कोई सामग्री अनुमान से नहीं जोड़ी गई है। सामग्री की स्वतंत्र सूची पूजन सामग्री मॉड्यूल में बनाई जाएगी।</p>`;
+ root.innerHTML=out;
+}
+function changeAcharyaRitual(v){window.acharyaRitualIndex=Number(v)||0;renderAcharya()}
+function acharyaToggleStep(i,checked){
+ const r=liveRituals[window.acharyaRitualIndex||0];let a=liveSaved(r);
+ if(checked&&!a.includes(i))a.push(i);
+ if(!checked)a=a.filter(x=>x!==i);
+ liveSetSaved(r,a);renderAcharya();
+}
+
 function openMode(m){
  let data={live:['Live विवाह संचालन','विवाह को क्रमशः संचालित करें। संस्कार चुनें, वर्तमान चरण पढ़ें, कार्य-विभाजन देखें और पूर्णता दर्ज करें।'],acharya:['आचार्य मोड','मूल संस्कृत मंत्र, हिंदी अर्थ, विनियोग, पूरी विधि और किस व्यक्ति को क्या करना है—सब एक स्क्रीन पर।'],helper:['सहायक मोड','सहायक को केवल तैयारी, सामग्री और अगले कार्य के स्पष्ट निर्देश दिखेंगे।'],materials:['पूजन सामग्री','प्रत्येक संस्कार की अलग सामग्री सूची और पूरी विवाह सामग्री की संयुक्त सूची।'],records:['विवाह रिकॉर्ड','विवाह का नाम/दिनांक और पूर्णता की स्थिति इस डिवाइस पर स्थानीय रूप से सुरक्षित रखने की सुविधा।']}[m];
  document.getElementById('home').style.display='none';
@@ -433,6 +487,7 @@ function openMode(m){
  document.getElementById('modeText').textContent=data[1];
  const content=document.getElementById('modeContent');
  if(m==='live'){liveRitualIndex=0;liveStepIndex=0;renderLive();}
+ else if(m==='acharya'){window.acharyaRitualIndex=0;renderAcharya();}
  else {content.className='placeholder';content.textContent='इस मॉड्यूल की कार्यशील सुविधाएँ अगले चरण में जोड़ी जाएँगी।';}
  window.scrollTo(0,0)
 }
