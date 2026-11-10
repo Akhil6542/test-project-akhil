@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#7b321f">
+<title>विवाह विधानम् | डिजिटल आचार्य सहायक</title>
+<style>
+:root{--bg:#fbf6ec;--panel:#fffdf8;--ink:#34251f;--muted:#806f63;--accent:#8b3d25;--gold:#c18a32;--line:#eadcc8;--soft:#f5ead8;--shadow:0 8px 26px #4b2c1710}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Devanagari","Mangal",system-ui,sans-serif}
+header{background:linear-gradient(115deg,#6e2b20,#9c4b29);color:#fff;padding:22px max(18px,calc((100% - 1120px)/2));}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:52px;height:52px;border:1px solid #e8c88b;border-radius:16px;display:grid;place-items:center;font-size:27px;background:#ffffff12}
+h1{font-size:clamp(23px,4vw,32px);margin:0}.tag{font-size:13px;color:#f6dfc1;margin-top:4px}
+main{max-width:1120px;margin:26px auto;padding:0 18px}.welcome{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:20px}.welcome h2{margin:0 0 5px;font-size:23px}.welcome p{margin:0;color:var(--muted);font-size:14px}
+.badge{background:#f0dfc4;color:#70401f;border:1px solid #e2c99f;padding:8px 12px;border-radius:99px;font-size:12px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:var(--shadow);text-align:left;color:inherit;cursor:pointer;transition:.15s}.card:hover{transform:translateY(-2px);border-color:#c99a5b}.icon{font-size:25px;margin-bottom:10px}.card h3{margin:0 0 5px;font-size:16px}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+.section{margin-top:28px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.section h2{font-size:19px;margin:0}.search{width:min(310px,55%);padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:var(--panel);font:inherit}
+.list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.ritual{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);padding:12px 14px;border-radius:12px;cursor:pointer}.num{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:var(--soft);color:var(--accent);font-weight:700;flex:none}.ritual strong{font-size:14px;font-weight:600}.ritual small{display:block;color:var(--muted);margin-top:2px}
+.view{display:none;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow);margin-top:18px}.view.active{display:block}.back{border:0;background:var(--soft);color:var(--accent);padding:9px 13px;border-radius:10px;font:inherit;cursor:pointer}.view h2{margin:16px 0 6px}.hint{color:var(--muted);font-size:14px;line-height:1.7}.placeholder{background:#fff8e9;border:1px dashed #d9b879;padding:16px;border-radius:12px;margin:16px 0;line-height:1.7}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.primary,.secondary{padding:11px 16px;border-radius:10px;border:0;font:inherit;cursor:pointer}.primary{background:var(--accent);color:white}.secondary{background:var(--soft);color:var(--accent)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:28px 12px}
+body.dark{--bg:#191512;--panel:#27211c;--ink:#f4eadc;--muted:#c0ad9b;--line:#493a2e;--soft:#3b2d23;--shadow:0 8px 26px #0003}body.dark .placeholder{background:#30271e;border-color:#82643b}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.list{grid-template-columns:1fr}.welcome{align-items:flex-start;flex-direction:column}.search{width:100%}.section-head{align-items:stretch;flex-direction:column}}
+@media(max-width:390px){.grid{grid-template-columns:1fr}.card{padding:15px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">॥ ॐ ॥</div><div><h1>विवाह विधानम्</h1><div class="tag">सम्पूर्ण विवाह संस्कार संचालन प्रणाली · डिजिटल आचार्य सहायक</div><div style="margin-top:9px;font-size:15px;font-weight:700;color:#ffe5b8;letter-spacing:.2px">PANDIT AKHILESH OJHA &nbsp; | &nbsp; M-9227132167</div></div></div></header>
+<main>
+<div id="home">
+ <div class="welcome"><div><h2>आचार्य जी, आपका स्वागत है</h2><p>पुस्तक-आधारित पूर्ण विधि को चरणबद्ध रूप से संचालित करें।</p></div><span class="badge">आधार ग्रंथ: सरल विवाह संस्कार पद्धति</span></div>
+ <div class="grid">
+  <button class="card" onclick="openMode('live')"><div class="icon">▶️</div><h3>Live विवाह संचालन</h3><p>एक-एक चरण, निर्देश और प्रगति के साथ।</p></button>
+  <button class="card" onclick="openMode('acharya')"><div class="icon">📖</div><h3>आचार्य मोड</h3><p>मंत्र, हिंदी अर्थ, सामग्री और संपूर्ण विधि।</p></button>
+  <button class="card" onclick="openMode('helper')"><div class="icon">🤝</div><h3>सहायक मोड</h3><p>सामग्री और कार्य संबंधी निर्देश।</p></button>
+  <button class="card" onclick="openMode('materials')"><div class="icon">🪔</div><h3>पूजन सामग्री</h3><p>संस्कारवार सामग्री सूची।</p></button>
+  <button class="card" onclick="openMode('records')"><div class="icon">🗂️</div><h3>विवाह रिकॉर्ड</h3><p>इस डिवाइस पर सुरक्षित स्थानीय रिकॉर्ड।</p></button>
+  <button class="card" onclick="toggleTheme()"><div class="icon">🌙</div><h3>डार्क / लाइट मोड</h3><p>विवाह स्थल की रोशनी के अनुसार स्क्रीन बदलें।</p></button>
+ </div>
+ <section class="section"><div class="section-head"><h2>विवाह संस्कार क्रम — पुस्तक की विषयानुक्रमणिका</h2><input class="search" id="search" placeholder="संस्कार खोजें…" oninput="filterRituals()"></div><div class="list" id="ritualList"></div></section>
+</div>
+<section class="view" id="detail"><button class="back" onclick="goHome()">← मुख्य पृष्ठ</button><h2 id="detailTitle"></h2><div class="hint" id="detailSub"></div><div class="placeholder" id="detailBody"></div><div class="actions"><button class="secondary" onclick="goHome()">संस्कार सूची</button><button class="primary" onclick="nextRitual()">अगला संस्कार →</button></div></section>
+<section class="view" id="modeView"><button class="back" onclick="goHome()">← मुख्य पृष्ठ</button><h2 id="modeTitle"></h2><p class="hint" id="modeText"></p><div class="placeholder">इस मॉड्यूल का वास्तविक मंत्र-पाठ और क्रिया-विवरण पुस्तक के संबंधित पृष्ठों से सत्यापित करके जोड़ा जाएगा। अभी कोई मंत्र या विधि अनुमान से नहीं भरी गई है।</div></section>
+</main>
+<footer>विवाह विधानम् · संस्करण 0.1 प्रारंभिक ढाँचा · सामग्री पुस्तक से सत्यापन के बाद जोड़ी जाएगी</footer>
+<script>
+const rituals=[
+"नम्र निवेदन एवं विवाहानुक्रमणिका","वर वरणम् (वरिच्छा)","तिलक संस्कार","गौरी-गणेश-कलश स्थापनम्","गौरी-गणेश-कलश आवाहनम्","गौरी-गणेश-कलश पूजनम्","नवग्रह-षोडशमातृका पूजनम्","नवग्रह आवाहन एवं पूजन","षोडशमातृका एवं नवग्रह पूजनम्","ब्राह्मण वरणम्","वर पूजनम्","लगन पुजाना","लगन खोलने की विधि","मठमँगरा (तनी कढ़ाई)","मण्डप (खम्भा) स्थापनम्","कलश स्थापन","कलश पूजा विधि","तेल","तेल चढ़ाने की विधि","मंत्री पूजन","देव-पितृ-निमन्त्रण","नान्दीमुख श्राद्ध","द्वार पूजन","वर-पूजन","विवाह विधान प्रारम्भ","अथ शालामन्त्रः","अग्नि स्थापन","शाखोच्चार","कन्यादान संकल्प","कुशकण्डिका","अन्तःपट","सप्तपदी","हृदयालम्भन","अभिषेक","विनय पद्यावली"];
+let current=0;
+function renderList(items=rituals){document.getElementById('ritualList').innerHTML=items.map(n=>{let i=rituals.indexOf(n);return `<div class="ritual" onclick="openRitual(${i})"><span class="num">${i+1}</span><div><strong>${n}</strong><small>पुस्तकानुसार पूर्ण विधि · सामग्री जोड़ी जानी है</small></div></div>`}).join('')}
+function filterRituals(){let q=document.getElementById('search').value.trim();renderList(rituals.filter(x=>x.includes(q)))}
+function openRitual(i){current=i;document.getElementById('home').style.display='none';document.getElementById('modeView').classList.remove('active');document.getElementById('detail').classList.add('active');document.getElementById('detailTitle').textContent=rituals[i];document.getElementById('detailSub').textContent=`विषय ${i+1} / ${rituals.length} · पूर्ण विधि`;document.getElementById('detailBody').innerHTML='इस संस्कार के मूल मंत्र, हिंदी अर्थ, विनियोग, सामग्री तथा आचार्य/सहायक के निर्देश पुस्तक के संबंधित पृष्ठों से लेकर यहाँ क्रमवार जोड़े जाएँगे। कृपया इस संस्कार के पृष्ठों की स्पष्ट तस्वीरें उपलब्ध कराएँ।';window.scrollTo(0,0)}
+function nextRitual(){openRitual((current+1)%rituals.length)}
+function openMode(m){let data={live:['Live विवाह संचालन','विवाह शुरू करने पर आचार्य और सहायक के निर्देश, वर्तमान चरण, पिछला/अगला चरण तथा पूर्णता की स्थिति दिखाई जाएगी।'],acharya:['आचार्य मोड','मूल संस्कृत मंत्र, हिंदी अर्थ, विनियोग, पूरी विधि और किस व्यक्ति को क्या करना है—सब एक स्क्रीन पर।'],helper:['सहायक मोड','सहायक को केवल तैयारी, सामग्री और अगले कार्य के स्पष्ट निर्देश दिखेंगे।'],materials:['पूजन सामग्री','प्रत्येक संस्कार की अलग सामग्री सूची और पूरी विवाह सामग्री की संयुक्त सूची।'],records:['विवाह रिकॉर्ड','विवाह का नाम/दिनांक और पूर्णता की स्थिति इस डिवाइस पर स्थानीय रूप से सुरक्षित रखने की सुविधा।']}[m];document.getElementById('home').style.display='none';document.getElementById('detail').classList.remove('active');document.getElementById('modeView').classList.add('active');document.getElementById('modeTitle').textContent=data[0];document.getElementById('modeText').textContent=data[1];window.scrollTo(0,0)}
+function goHome(){document.getElementById('detail').classList.remove('active');document.getElementById('modeView').classList.remove('active');document.getElementById('home').style.display='block';window.scrollTo(0,0)}
+function toggleTheme(){document.body.classList.toggle('dark');localStorage.setItem('vivahTheme',document.body.classList.contains('dark')?'dark':'light')}
+if(localStorage.getItem('vivahTheme')==='dark')document.body.classList.add('dark');
+renderList();
+</script>
+</body></html>
