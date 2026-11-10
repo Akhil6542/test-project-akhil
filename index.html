@@ -98,6 +98,21 @@ body.dark .helper-toolbar select{background:var(--panel);color:var(--ink);border
 .material-summary{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--soft);line-height:1.7}
 body.dark .material-toolbar select,body.dark .material-toolbar input{background:var(--panel);color:var(--ink);border-color:var(--line)}
 
+
+.record-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.record-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;padding:15px;border:1px solid var(--line);background:var(--panel);border-radius:14px;margin:12px 0}
+.record-field{display:flex;flex-direction:column;gap:6px}
+.record-field label{font-weight:700;font-size:13px}
+.record-field input,.record-field textarea,.record-toolbar select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit;box-sizing:border-box}
+.record-field textarea{min-height:76px;resize:vertical}
+.record-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.record-card{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:14px;margin:12px 0}
+.record-card h3{margin:0 0 8px}
+.record-meta{color:var(--muted);font-size:13px;line-height:1.7}
+.record-progress{height:9px;background:var(--soft);border-radius:99px;overflow:hidden;margin:8px 0}
+.record-progress>span{display:block;height:100%;background:var(--accent);border-radius:99px}
+.record-note{font-size:12px;color:var(--muted);line-height:1.7}
+
 </style>
 </head>
 <body>
@@ -570,6 +585,86 @@ function changeMaterialRitual(v){window.materialRitualIndex=Number(v);renderMate
 function showAllMaterials(){window.materialRitualIndex=-1;renderMaterials()}
 function materialToggle(key,checked){const a=materialRead();if(checked)a[key]=true;else delete a[key];materialWrite(a);renderMaterials()}
 
+
+const RECORDS_KEY='vv_marriage_records_v1';
+const RECORD_ACTIVE_KEY='vv_active_marriage_record_v1';
+function recordsRead(){try{return JSON.parse(localStorage.getItem(RECORDS_KEY)||'[]')}catch(e){return []}}
+function recordsWrite(a){localStorage.setItem(RECORDS_KEY,JSON.stringify(a))}
+function recordEscape(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function ritualProgressSnapshot(){
+ const keys=['vv_varanam_done','vv_tilak_done','vv_mantri_done','vv_nandi_done','vv_dwar_done','vv_chadhav_done','vv_vivah_prarambh_done'];
+ const names=['वर वरणम्','तिलक संस्कार','मंत्री / मयण पूजन','नान्दीमुख श्राद्ध','द्वार पूजन','चढ़ाव','विवाह विधान प्रारम्भ'];
+ return names.map((name,i)=>{let a=[];try{a=JSON.parse(localStorage.getItem(keys[i])||'[]')}catch(e){};return {name,done:Array.isArray(a)?a.length:0}});
+}
+function recordProgressSummary(){
+ const p=ritualProgressSnapshot();const done=p.reduce((s,x)=>s+x.done,0);
+ return {items:p,total:done};
+}
+function renderRecords(){
+ const root=document.getElementById('modeContent');
+ const records=recordsRead();const active=localStorage.getItem(RECORD_ACTIVE_KEY)||'';
+ const selected=records.find(r=>r.id===active)||null;
+ const p=recordProgressSummary();
+ let html=`<div class="record-note">यह रिकॉर्ड केवल इसी ब्राउज़र/डिवाइस के स्थानीय संग्रहण में रहेगा। इसे अपने आप किसी सर्वर पर नहीं भेजा जाता। नया विवाह रिकॉर्ड बनाने के बाद उसे सक्रिय चुनें; उस समय की संस्कार-प्रगति रिकॉर्ड में दर्ज की जा सकती है।</div>`;
+ html+=`<form class="record-form" onsubmit="saveMarriageRecord(event)">
+ <input type="hidden" id="recordId" value="${selected?recordEscape(selected.id):''}">
+ <div class="record-field"><label for="recordTitle">विवाह / आयोजन का नाम *</label><input id="recordTitle" required maxlength="100" placeholder="जैसे — शर्मा परिवार विवाह" value="${selected?recordEscape(selected.title):''}"></div>
+ <div class="record-field"><label for="recordDate">विवाह की तिथि</label><input id="recordDate" type="date" value="${selected?recordEscape(selected.date):''}"></div>
+ <div class="record-field"><label for="recordGroom">वर का नाम</label><input id="recordGroom" maxlength="100" value="${selected?recordEscape(selected.groom):''}"></div>
+ <div class="record-field"><label for="recordBride">कन्या का नाम</label><input id="recordBride" maxlength="100" value="${selected?recordEscape(selected.bride):''}"></div>
+ <div class="record-field"><label for="recordVenue">विवाह स्थल</label><input id="recordVenue" maxlength="160" value="${selected?recordEscape(selected.venue):''}"></div>
+ <div class="record-field"><label for="recordPhone">संपर्क (वैकल्पिक)</label><input id="recordPhone" maxlength="40" value="${selected?recordEscape(selected.phone):''}"></div>
+ <div class="record-field" style="grid-column:1/-1"><label for="recordNotes">विशेष टिप्पणी</label><textarea id="recordNotes" maxlength="1000" placeholder="आवश्यक निर्देश या टिप्पणी">${selected?recordEscape(selected.notes):''}</textarea></div>
+ <div class="record-actions" style="grid-column:1/-1"><button class="primary" type="submit">${selected?'रिकॉर्ड अपडेट करें':'नया रिकॉर्ड सुरक्षित करें'}</button><button class="secondary" type="button" onclick="newMarriageRecord()">नया रिकॉर्ड</button></div>
+ </form>`;
+ if(records.length){
+   html+=`<div class="record-toolbar"><label for="recordSelect"><b>सक्रिय विवाह रिकॉर्ड:</b></label><select id="recordSelect" onchange="activateMarriageRecord(this.value)"><option value="">— रिकॉर्ड चुनें —</option>${records.map(r=>`<option value="${recordEscape(r.id)}" ${r.id===active?'selected':''}>${recordEscape(r.title)}${r.date?' · '+recordEscape(r.date):''}</option>`).join('')}</select></div>`;
+   html+=`<h3>सहेजे गए रिकॉर्ड</h3>`;
+   records.forEach(r=>{
+     const isActive=r.id===active;const pr=r.progress||[];
+     html+=`<section class="record-card"><h3>${recordEscape(r.title)} ${isActive?'<span class="badge">सक्रिय</span>':''}</h3>
+     <div class="record-meta">${r.date?'तिथि: '+recordEscape(r.date)+' · ':''}${r.groom?'वर: '+recordEscape(r.groom)+' · ':''}${r.bride?'कन्या: '+recordEscape(r.bride)+' · ':''}${r.venue?'स्थल: '+recordEscape(r.venue):''}</div>
+     <div class="record-meta">अंतिम सहेजना: ${recordEscape(r.updatedAt||'—')}</div>
+     <div class="record-actions"><button class="secondary" type="button" onclick="activateMarriageRecord('${recordEscape(r.id)}')">${isActive?'सक्रिय है':'सक्रिय करें'}</button><button class="secondary" type="button" onclick="loadMarriageRecord('${recordEscape(r.id)}')">संपादन</button><button class="secondary" type="button" onclick="captureMarriageProgress('${recordEscape(r.id)}')">वर्तमान प्रगति सहेजें</button><button class="secondary" type="button" onclick="exportMarriageRecord('${recordEscape(r.id)}')">रिकॉर्ड डाउनलोड</button><button class="secondary" type="button" onclick="deleteMarriageRecord('${recordEscape(r.id)}')">हटाएँ</button></div>
+     ${pr.length?`<div class="record-note">पिछली सहेजी प्रगति: ${pr.map(x=>recordEscape(x.name)+': '+x.done).join(' · ')}</div>`:'<div class="record-note">अभी तक इस रिकॉर्ड में संस्कार-प्रगति अलग से सहेजी नहीं गई है।</div>'}
+     </section>`;
+   });
+ } else html+=`<div class="helper-empty">अभी कोई विवाह रिकॉर्ड नहीं है। ऊपर विवरण भरकर पहला रिकॉर्ड सुरक्षित करें।</div>`;
+ html+=`<div class="record-note">महत्वपूर्ण: यह सुविधा रिकॉर्ड और प्रगति का विवरण सुरक्षित करती है; यह पुराने संस्कारों की टिक-स्थिति को अलग-अलग विवाहों में स्वतः बदलती/अलग नहीं करती। हर विवाह के लिए नया रिकॉर्ड बनाते समय वर्तमान चेकलिस्ट की स्थिति जाँच लें।</div>`;
+ root.innerHTML=html;
+}
+function newMarriageRecord(){
+ document.getElementById('recordId').value='';
+ ['recordTitle','recordDate','recordGroom','recordBride','recordVenue','recordPhone','recordNotes'].forEach(id=>document.getElementById(id).value='');
+ document.getElementById('recordTitle').focus();
+}
+function saveMarriageRecord(e){
+ e.preventDefault();
+ const title=document.getElementById('recordTitle').value.trim();if(!title)return;
+ const a=recordsRead();let id=document.getElementById('recordId').value;
+ if(!id)id='vv_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+ const old=a.find(x=>x.id===id)||{};
+ const r={...old,id,title,date:document.getElementById('recordDate').value,groom:document.getElementById('recordGroom').value.trim(),bride:document.getElementById('recordBride').value.trim(),venue:document.getElementById('recordVenue').value.trim(),phone:document.getElementById('recordPhone').value.trim(),notes:document.getElementById('recordNotes').value.trim(),updatedAt:new Date().toLocaleString('hi-IN')};
+ const i=a.findIndex(x=>x.id===id);if(i>=0)a[i]=r;else a.unshift(r);
+ recordsWrite(a);localStorage.setItem(RECORD_ACTIVE_KEY,id);renderRecords();
+}
+function activateMarriageRecord(id){if(id)localStorage.setItem(RECORD_ACTIVE_KEY,id);else localStorage.removeItem(RECORD_ACTIVE_KEY);renderRecords()}
+function loadMarriageRecord(id){localStorage.setItem(RECORD_ACTIVE_KEY,id);renderRecords()}
+function captureMarriageProgress(id){
+ const a=recordsRead(),i=a.findIndex(x=>x.id===id);if(i<0)return;
+ a[i].progress=ritualProgressSnapshot();a[i].progressSavedAt=new Date().toLocaleString('hi-IN');a[i].updatedAt=a[i].progressSavedAt;recordsWrite(a);renderRecords();
+}
+function deleteMarriageRecord(id){
+ if(!confirm('क्या यह विवाह रिकॉर्ड हटाना चाहते हैं? यह कार्य वापस नहीं होगा।'))return;
+ recordsWrite(recordsRead().filter(x=>x.id!==id));if(localStorage.getItem(RECORD_ACTIVE_KEY)===id)localStorage.removeItem(RECORD_ACTIVE_KEY);renderRecords();
+}
+function exportMarriageRecord(id){
+ const r=recordsRead().find(x=>x.id===id);if(!r)return;
+ const payload={...r,progress:r.progress||ritualProgressSnapshot(),exportedAt:new Date().toLocaleString('hi-IN')};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Vivah_Record_'+(r.title||'record').replace(/[^a-z0-9\u0900-\u097F_-]/gi,'_')+'.json';a.click();URL.revokeObjectURL(url);
+}
+
 function openMode(m){
  let data={live:['Live विवाह संचालन','विवाह को क्रमशः संचालित करें। संस्कार चुनें, वर्तमान चरण पढ़ें, कार्य-विभाजन देखें और पूर्णता दर्ज करें।'],acharya:['आचार्य मोड','मूल संस्कृत मंत्र, हिंदी अर्थ, विनियोग, पूरी विधि और किस व्यक्ति को क्या करना है—सब एक स्क्रीन पर।'],helper:['सहायक मोड','सहायक को केवल तैयारी, सामग्री और अगले कार्य के स्पष्ट निर्देश दिखेंगे।'],materials:['पूजन सामग्री','प्रत्येक संस्कार की अलग सामग्री सूची और पूरी विवाह सामग्री की संयुक्त सूची।'],records:['विवाह रिकॉर्ड','विवाह का नाम/दिनांक और पूर्णता की स्थिति इस डिवाइस पर स्थानीय रूप से सुरक्षित रखने की सुविधा।']}[m];
  document.getElementById('home').style.display='none';
@@ -582,6 +677,7 @@ function openMode(m){
  else if(m==='acharya'){window.acharyaRitualIndex=0;renderAcharya();}
  else if(m==='helper'){window.helperRitualIndex=0;renderHelper();}
  else if(m==='materials'){window.materialRitualIndex=0;renderMaterials();}
+ else if(m==='records'){content.className='';renderRecords();}
  else {content.className='placeholder';content.textContent='इस मॉड्यूल की कार्यशील सुविधाएँ अगले चरण में जोड़ी जाएँगी।';}
  window.scrollTo(0,0)
 }
