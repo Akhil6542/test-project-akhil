@@ -20,6 +20,15 @@ main{max-width:1120px;margin:26px auto;padding:0 18px}.welcome{display:flex;just
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.primary,.secondary{padding:11px 16px;border-radius:10px;border:0;font:inherit;cursor:pointer}.primary{background:var(--accent);color:white}.secondary{background:var(--soft);color:var(--accent)}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:28px 12px}
 body.dark{--bg:#191512;--panel:#27211c;--ink:#f4eadc;--muted:#c0ad9b;--line:#493a2e;--soft:#3b2d23;--shadow:0 8px 26px #0003}body.dark .placeholder{background:#30271e;border-color:#82643b}
+/* डार्क मोड: मुख्य पृष्ठ के सभी छह कार्ड और उनके अंदर का पाठ */
+body.dark .card{background:var(--panel);color:var(--ink);border-color:var(--line)}
+body.dark .card p{color:var(--muted)}
+body.dark .card:hover{border-color:#82643b}
+body.dark .search{background:var(--panel);color:var(--ink);border-color:var(--line)}
+body.dark .ritual{background:var(--panel);color:var(--ink);border-color:var(--line)}
+body.dark .ritual strong{color:var(--ink)}
+body.dark .ritual small{color:var(--muted)}
+
 @media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.list{grid-template-columns:1fr}.welcome{align-items:flex-start;flex-direction:column}.search{width:100%}.section-head{align-items:stretch;flex-direction:column}}
 @media(max-width:390px){.grid{grid-template-columns:1fr}.card{padding:15px}}
 
@@ -43,6 +52,19 @@ body.dark .mantra{background:#30271e;color:#f4eadc}
 .source-note{font-size:12px;color:var(--muted);line-height:1.7;margin-top:15px}
 .source-note a{color:var(--accent)}
 
+
+.live-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.live-toolbar select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit;min-width:min(100%,280px)}
+.live-progress{height:8px;background:var(--soft);border-radius:20px;overflow:hidden;margin:10px 0 16px}
+.live-progress>span{display:block;height:100%;background:var(--gold);width:0}
+.live-step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.live-step h3{margin:0 0 8px}
+.live-step p{line-height:1.8}
+.live-task{padding-left:20px;line-height:1.8}
+.live-nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.live-done{display:flex;gap:9px;align-items:center;margin:14px 0;font-weight:700}
+body.dark .live-toolbar select{background:var(--panel);color:var(--ink);border-color:var(--line)}
+
 </style>
 </head>
 <body>
@@ -61,7 +83,7 @@ body.dark .mantra{background:#30271e;color:#f4eadc}
  <section class="section"><div class="section-head"><h2>वर्तमान संस्कार</h2><input class="search" id="search" placeholder="संस्कार खोजें…" oninput="filterRituals()"></div><div class="list" id="ritualList"></div></section>
 </div>
 <section class="view" id="detail"><button class="back" onclick="goHome()">← मुख्य पृष्ठ</button><h2 id="detailTitle"></h2><div class="hint" id="detailSub"></div><div class="ritual-workflow" id="detailBody"></div><div class="actions"><button class="secondary" onclick="goHome()">संस्कार सूची</button><button class="primary" onclick="nextRitual()">अगला संस्कार →</button></div></section>
-<section class="view" id="modeView"><button class="back" onclick="goHome()">← मुख्य पृष्ठ</button><h2 id="modeTitle"></h2><p class="hint" id="modeText"></p><div class="placeholder">इस मॉड्यूल का वास्तविक मंत्र-पाठ और क्रिया-विवरण पुस्तक के संबंधित पृष्ठों से सत्यापित करके जोड़ा जाएगा। अभी कोई मंत्र या विधि अनुमान से नहीं भरी गई है।</div></section>
+<section class="view" id="modeView"><button class="back" onclick="goHome()">← मुख्य पृष्ठ</button><h2 id="modeTitle"></h2><p class="hint" id="modeText"></p><div class="placeholder" id="modeContent">इस मॉड्यूल का वास्तविक मंत्र-पाठ और क्रिया-विवरण पुस्तक के संबंधित पृष्ठों से सत्यापित करके जोड़ा जाएगा। अभी कोई मंत्र या विधि अनुमान से नहीं भरी गई है।</div></section>
 </main>
 <footer>विवाह विधानम् · संस्करण 0.1 प्रारंभिक ढाँचा · सामग्री पुस्तक से सत्यापन के बाद जोड़ी जाएगी</footer>
 <script>
@@ -341,7 +363,79 @@ function renderVivahPrarambh(){
 function toggleVivahPrarambh(i,v){let a=JSON.parse(localStorage.getItem('vv_vivah_prarambh_done')||'[]');a=v?[...new Set([...a,i])]:a.filter(x=>x!==i);localStorage.setItem('vv_vivah_prarambh_done',JSON.stringify(a));renderVivahPrarambh();}
 function openRitual(i){current=i;document.getElementById('home').style.display='none';document.getElementById('modeView').classList.remove('active');document.getElementById('detail').classList.add('active');document.getElementById('detailTitle').textContent=rituals[i];document.getElementById('detailSub').textContent=`विषय ${i+1} / ${rituals.length} · पूर्ण विधि`;if(i===0){renderVarVaranam()}else if(i===1){renderTilak()}else if(i===2){renderMantri()}else if(i===3){renderNandiShradh()}else if(i===4){renderDwarPujan()}else if(i===5){renderChadhav()}else if(i===6){renderVivahPrarambh()}window.scrollTo(0,0)}
 function nextRitual(){openRitual((current+1)%rituals.length)}
-function openMode(m){let data={live:['Live विवाह संचालन','विवाह शुरू करने पर आचार्य और सहायक के निर्देश, वर्तमान चरण, पिछला/अगला चरण तथा पूर्णता की स्थिति दिखाई जाएगी।'],acharya:['आचार्य मोड','मूल संस्कृत मंत्र, हिंदी अर्थ, विनियोग, पूरी विधि और किस व्यक्ति को क्या करना है—सब एक स्क्रीन पर।'],helper:['सहायक मोड','सहायक को केवल तैयारी, सामग्री और अगले कार्य के स्पष्ट निर्देश दिखेंगे।'],materials:['पूजन सामग्री','प्रत्येक संस्कार की अलग सामग्री सूची और पूरी विवाह सामग्री की संयुक्त सूची।'],records:['विवाह रिकॉर्ड','विवाह का नाम/दिनांक और पूर्णता की स्थिति इस डिवाइस पर स्थानीय रूप से सुरक्षित रखने की सुविधा।']}[m];document.getElementById('home').style.display='none';document.getElementById('detail').classList.remove('active');document.getElementById('modeView').classList.add('active');document.getElementById('modeTitle').textContent=data[0];document.getElementById('modeText').textContent=data[1];window.scrollTo(0,0)}
+
+const liveRituals = [
+ {name:"वर वरणम् (वरिच्छा)",steps:varVaranamSteps,key:"vv_varanam_done"},
+ {name:"तिलक संस्कार",steps:tilakSteps,key:"vv_tilak_done"},
+ {name:"मंत्री / मयण पूजन",steps:mantriSteps,key:"vv_mantri_done"},
+ {name:"नान्दीमुख श्राद्ध",steps:nandiShradhSteps,key:"vv_nandi_done"},
+ {name:"द्वार पूजन",steps:dwarPujanSteps,key:"vv_dwar_done"},
+ {name:"चढ़ाव",steps:chadhavSteps,key:"vv_chadhav_done"},
+ {name:"विवाह विधान प्रारम्भ",steps:vivahPrarambhSteps,key:"vv_vivah_prarambh_done"}
+];
+let liveRitualIndex=0, liveStepIndex=0;
+function liveSaved(r){try{return JSON.parse(localStorage.getItem(r.key)||"[]")}catch(e){return []}}
+function liveSetSaved(r,a){localStorage.setItem(r.key,JSON.stringify(a))}
+function renderLive(){
+ const root=document.getElementById("modeContent");
+ const r=liveRituals[liveRitualIndex];
+ if(!r || !r.steps || !r.steps.length){root.innerHTML='<p>इस संस्कार के चरण उपलब्ध नहीं हैं।</p>';return}
+ liveStepIndex=Math.max(0,Math.min(liveStepIndex,r.steps.length-1));
+ const saved=liveSaved(r), st=r.steps[liveStepIndex], done=saved.includes(liveStepIndex);
+ const totalDone=saved.length, pct=Math.round(totalDone/r.steps.length*100);
+ const tasks=st.tasks||[];
+ root.innerHTML=`
+  <div class="live-toolbar">
+   <label for="liveRitualSelect"><b>संस्कार चुनें:</b></label>
+   <select id="liveRitualSelect" onchange="changeLiveRitual(this.value)">
+    ${liveRituals.map((x,i)=>`<option value="${i}" ${i===liveRitualIndex?'selected':''}>${i+1}. ${x.name}</option>`).join("")}
+   </select>
+   <span class="status">${totalDone} / ${r.steps.length} चरण पूर्ण</span>
+  </div>
+  <div class="live-progress"><span style="width:${pct}%"></span></div>
+  <div class="step-meta">चरण ${liveStepIndex+1} / ${r.steps.length} · ${st.kind||"विधि"}</div>
+  <article class="live-step">
+   <h3>${st.title||"वर्तमान चरण"}</h3>
+   ${st.body?`<p>${st.body}</p>`:""}
+   ${st.mantra?`<h4>मंत्र</h4><div class="mantra">${st.mantra}</div>`:""}
+   ${st.meaning?`<p><b>सरल अर्थ:</b> ${st.meaning}</p>`:""}
+   ${tasks.length?`<h4>कार्य-विभाजन / करने के कार्य</h4><ul class="live-task">${tasks.map(t=>`<li>${t}</li>`).join("")}</ul>`:""}
+   <label class="live-done"><input type="checkbox" ${done?"checked":""} onchange="toggleLiveDone(this.checked)"> यह चरण पूर्ण हुआ</label>
+  </article>
+  <div class="live-nav">
+   <button class="secondary" onclick="livePrev()" ${liveStepIndex===0?"disabled":""}>← पिछला चरण</button>
+   <button class="primary" onclick="liveNext()">${liveStepIndex===r.steps.length-1?"अगला संस्कार →":"अगला चरण →"}</button>
+   <button class="secondary" onclick="openRitual(${liveRitualIndex})">पूरी विधि देखें</button>
+  </div>
+  <p class="source-note">पूर्णता इसी डिवाइस के ब्राउज़र में सुरक्षित होती है। किसी चरण को पूरा चिह्नित करना अनिवार्य नहीं; आप सीधे अगले चरण पर भी जा सकते हैं।</p>`;
+}
+function changeLiveRitual(v){liveRitualIndex=Number(v)||0;liveStepIndex=0;renderLive()}
+function toggleLiveDone(checked){
+ const r=liveRituals[liveRitualIndex];let a=liveSaved(r);
+ if(checked&&!a.includes(liveStepIndex))a.push(liveStepIndex);
+ if(!checked)a=a.filter(x=>x!==liveStepIndex);
+ liveSetSaved(r,a);renderLive();
+}
+function livePrev(){if(liveStepIndex>0){liveStepIndex--;renderLive()}}
+function liveNext(){
+ const r=liveRituals[liveRitualIndex];
+ if(liveStepIndex<r.steps.length-1){liveStepIndex++;renderLive();return}
+ if(liveRitualIndex<liveRituals.length-1){liveRitualIndex++;liveStepIndex=0;renderLive();return}
+ document.getElementById("modeContent").insertAdjacentHTML("beforeend",'<p class="status">सभी उपलब्ध संस्कारों के चरण देख लिए गए हैं।</p>');
+}
+
+function openMode(m){
+ let data={live:['Live विवाह संचालन','विवाह को क्रमशः संचालित करें। संस्कार चुनें, वर्तमान चरण पढ़ें, कार्य-विभाजन देखें और पूर्णता दर्ज करें।'],acharya:['आचार्य मोड','मूल संस्कृत मंत्र, हिंदी अर्थ, विनियोग, पूरी विधि और किस व्यक्ति को क्या करना है—सब एक स्क्रीन पर।'],helper:['सहायक मोड','सहायक को केवल तैयारी, सामग्री और अगले कार्य के स्पष्ट निर्देश दिखेंगे।'],materials:['पूजन सामग्री','प्रत्येक संस्कार की अलग सामग्री सूची और पूरी विवाह सामग्री की संयुक्त सूची।'],records:['विवाह रिकॉर्ड','विवाह का नाम/दिनांक और पूर्णता की स्थिति इस डिवाइस पर स्थानीय रूप से सुरक्षित रखने की सुविधा।']}[m];
+ document.getElementById('home').style.display='none';
+ document.getElementById('detail').classList.remove('active');
+ document.getElementById('modeView').classList.add('active');
+ document.getElementById('modeTitle').textContent=data[0];
+ document.getElementById('modeText').textContent=data[1];
+ const content=document.getElementById('modeContent');
+ if(m==='live'){liveRitualIndex=0;liveStepIndex=0;renderLive();}
+ else {content.className='placeholder';content.textContent='इस मॉड्यूल की कार्यशील सुविधाएँ अगले चरण में जोड़ी जाएँगी।';}
+ window.scrollTo(0,0)
+}
 function goHome(){document.getElementById('detail').classList.remove('active');document.getElementById('modeView').classList.remove('active');document.getElementById('home').style.display='block';window.scrollTo(0,0)}
 function toggleTheme(){document.body.classList.toggle('dark');localStorage.setItem('vivahTheme',document.body.classList.contains('dark')?'dark':'light')}
 if(localStorage.getItem('vivahTheme')==='dark')document.body.classList.add('dark');
