@@ -67,7 +67,7 @@ body.dark .mantra{background:#30271e;color:#f4eadc}
 // अभी केवल उपयोगकर्ता द्वारा स्वीकृत दो अध्याय रखे गए हैं। आगे के अध्याय उपयोगकर्ता के कहने पर ही जोड़े जाएँगे।
 const rituals=["वर वरणम् (वरिच्छा)","तिलक संस्कार"];
 let current=0;
-function renderList(items=rituals){document.getElementById('ritualList').innerHTML=items.map(n=>{let i=rituals.indexOf(n);return `<div class="ritual" onclick="openRitual(${i})"><span class="num">${i+1}</span><div><strong>${n}</strong><small>पुस्तकानुसार पूर्ण विधि · सामग्री जोड़ी जानी है</small></div></div>`}).join('')}
+function renderList(items=rituals){document.getElementById('ritualList').innerHTML=items.map(n=>{let i=rituals.indexOf(n);return `<div class="ritual" onclick="openRitual(${i})"><span class="num">${i+1}</span><div><strong>${n}</strong></div></div>`}).join('')}
 function filterRituals(){let q=document.getElementById('search').value.trim();renderList(rituals.filter(x=>x.includes(q)))}
 
 const varVaranamSteps = [
