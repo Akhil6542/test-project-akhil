@@ -22,6 +22,26 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:28px 12px}
 body.dark{--bg:#191512;--panel:#27211c;--ink:#f4eadc;--muted:#c0ad9b;--line:#493a2e;--soft:#3b2d23;--shadow:0 8px 26px #0003}body.dark .placeholder{background:#30271e;border-color:#82643b}
 @media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.list{grid-template-columns:1fr}.welcome{align-items:flex-start;flex-direction:column}.search{width:100%}.section-head{align-items:stretch;flex-direction:column}}
 @media(max-width:390px){.grid{grid-template-columns:1fr}.card{padding:15px}}
+
+.ritual-workflow{margin-top:18px}
+.ritual-intro{background:#fff8e9;border:1px solid #e7d2ad;border-radius:14px;padding:15px;line-height:1.75}
+.step-card{border:1px solid var(--line);background:var(--panel);border-radius:14px;margin:12px 0;overflow:hidden}
+.step-head{display:flex;align-items:center;gap:12px;padding:13px 15px;background:var(--soft)}
+.step-index{width:32px;height:32px;flex:none;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700}
+.step-head h3{font-size:16px;margin:0;flex:1}
+.step-body{padding:15px;line-height:1.8}
+.mantra{white-space:pre-wrap;background:#f8f1e5;border-left:4px solid var(--gold);padding:13px;border-radius:8px;font-size:17px;line-height:2;color:#38271e}
+body.dark .mantra{background:#30271e;color:#f4eadc}
+.step-meta{font-size:12px;color:var(--muted);margin:8px 0}
+.status{display:inline-block;border-radius:20px;padding:4px 9px;font-size:11px;font-weight:700;background:#e4f3e7;color:#236b35}
+.status.review{background:#fff0cf;color:#845411}
+.checkline{display:flex;gap:9px;align-items:flex-start;margin:9px 0}
+.checkline input{margin-top:7px;accent-color:var(--accent)}
+.progress-wrap{height:8px;background:var(--soft);border-radius:20px;overflow:hidden;margin:10px 0 15px}
+.progress-bar{height:100%;width:0;background:var(--gold);transition:width .2s}
+.source-note{font-size:12px;color:var(--muted);line-height:1.7;margin-top:15px}
+.source-note a{color:var(--accent)}
+
 </style>
 </head>
 <body>
@@ -39,7 +59,7 @@ body.dark{--bg:#191512;--panel:#27211c;--ink:#f4eadc;--muted:#c0ad9b;--line:#493
  </div>
  <section class="section"><div class="section-head"><h2>विवाह संस्कार क्रम — पुस्तक की विषयानुक्रमणिका</h2><input class="search" id="search" placeholder="संस्कार खोजें…" oninput="filterRituals()"></div><div class="list" id="ritualList"></div></section>
 </div>
-<section class="view" id="detail"><button class="back" onclick="goHome()">← मुख्य पृष्ठ</button><h2 id="detailTitle"></h2><div class="hint" id="detailSub"></div><div class="placeholder" id="detailBody"></div><div class="actions"><button class="secondary" onclick="goHome()">संस्कार सूची</button><button class="primary" onclick="nextRitual()">अगला संस्कार →</button></div></section>
+<section class="view" id="detail"><button class="back" onclick="goHome()">← मुख्य पृष्ठ</button><h2 id="detailTitle"></h2><div class="hint" id="detailSub"></div><div class="ritual-workflow" id="detailBody"></div><div class="actions"><button class="secondary" onclick="goHome()">संस्कार सूची</button><button class="primary" onclick="nextRitual()">अगला संस्कार →</button></div></section>
 <section class="view" id="modeView"><button class="back" onclick="goHome()">← मुख्य पृष्ठ</button><h2 id="modeTitle"></h2><p class="hint" id="modeText"></p><div class="placeholder">इस मॉड्यूल का वास्तविक मंत्र-पाठ और क्रिया-विवरण पुस्तक के संबंधित पृष्ठों से सत्यापित करके जोड़ा जाएगा। अभी कोई मंत्र या विधि अनुमान से नहीं भरी गई है।</div></section>
 </main>
 <footer>विवाह विधानम् · संस्करण 0.1 प्रारंभिक ढाँचा · सामग्री पुस्तक से सत्यापन के बाद जोड़ी जाएगी</footer>
@@ -49,7 +69,45 @@ const rituals=[
 let current=0;
 function renderList(items=rituals){document.getElementById('ritualList').innerHTML=items.map(n=>{let i=rituals.indexOf(n);return `<div class="ritual" onclick="openRitual(${i})"><span class="num">${i+1}</span><div><strong>${n}</strong><small>पुस्तकानुसार पूर्ण विधि · सामग्री जोड़ी जानी है</small></div></div>`}).join('')}
 function filterRituals(){let q=document.getElementById('search').value.trim();renderList(rituals.filter(x=>x.includes(q)))}
-function openRitual(i){current=i;document.getElementById('home').style.display='none';document.getElementById('modeView').classList.remove('active');document.getElementById('detail').classList.add('active');document.getElementById('detailTitle').textContent=rituals[i];document.getElementById('detailSub').textContent=`विषय ${i+1} / ${rituals.length} · पूर्ण विधि`;document.getElementById('detailBody').innerHTML='इस संस्कार के मूल मंत्र, हिंदी अर्थ, विनियोग, सामग्री तथा आचार्य/सहायक के निर्देश पुस्तक के संबंधित पृष्ठों से लेकर यहाँ क्रमवार जोड़े जाएँगे। कृपया इस संस्कार के पृष्ठों की स्पष्ट तस्वीरें उपलब्ध कराएँ।';window.scrollTo(0,0)}
+
+const varVaranamSteps = [
+ {title:"आसन एवं प्रारम्भिक व्यवस्था",kind:"विधि",status:"पुस्तक से व्यवस्थित",body:"शुभ मुहूर्त में कन्या का भाई अथवा पिता स्वजनों तथा ब्राह्मणों के साथ वर के घर/मण्डप में आएँ। पुस्तक के निर्देशानुसार वर को पीढ़े पर पूर्वमुख बैठाया जाता है। स्थानीय कुलाचार और विवाह-स्थल की व्यवस्था के अनुसार आसन निश्चित करें।",tasks:["वर के बैठने के लिए पीढ़ा/आसन रखें।","कन्या पक्ष के पिता/भाई तथा ब्राह्मणों की उपस्थिति सुनिश्चित करें।","आचार्य पूजन सामग्री अपने पास व्यवस्थित रखें।"]},
+ {title:"पवित्रीकरण",kind:"मंत्र एवं क्रिया",status:"पाठ मिलान आवश्यक",body:"पुस्तक के पृष्ठ पर पवित्रीकरण का मंत्र दिया है। फोटो में कुछ अक्षर अस्पष्ट हैं; इसलिए मूल पाठ को अंतिम मंत्र-पाठ के रूप में अभी लॉक नहीं किया गया है।",mantra:"ॐ अपवित्रः पवित्रो वा सर्वावस्थां गतोऽपि वा।\nयः स्मरेत् पुण्डरीकाक्षं स बाह्याभ्यन्तरः शुचिः॥",meaning:"भगवान पुण्डरीकाक्ष का स्मरण करने से बाहरी और भीतरी पवित्रता का भाव किया जाता है।",tasks:["आचमन/पवित्रीकरण हेतु स्वच्छ जल रखें।","मंत्र का पाठ कर उपस्थित जनों और पूजन सामग्री पर जल छिड़कें।"]},
+ {title:"आचमन एवं शिखा बन्धन",kind:"मंत्र एवं क्रिया",status:"पुस्तक-फोटो से पठनीय",body:"पुस्तक में तीन बार आचमन, फिर दोनों हाथ धोने और शिखा बाँधने का निर्देश है।",mantra:"ॐ केशवाय नमः।\nॐ नारायणाय नमः।\nॐ माधवाय नमः।\n\nॐ हृषीकेशाय नमः। पुण्डरीकाक्षः पुनातु।",meaning:"आचमन में भगवान केशव, नारायण और माधव का स्मरण किया जाता है। इसके बाद हाथों को शुद्ध किया जाता है।",tasks:["तीन बार आचमन कराएँ।","दोनों हाथ जल से धुलवाएँ।","शिखा बाँधने की क्रिया कराएँ।"]},
+ {title:"रक्षा-दीप एवं पवित्री धारण",kind:"क्रिया",status:"पाठ मिलान आवश्यक",body:"पुस्तक में रक्षा-दीप जलाने और कुश की पवित्री/पवित्र धारण कराने का निर्देश दिखता है। संबंधित मंत्र की कुछ मात्राएँ फोटो में स्पष्ट नहीं हैं।",tasks:["रक्षा-दीप जलाएँ।","कुश की पवित्री उपलब्ध कराएँ और परम्परा के अनुसार धारण कराएँ।","मंत्र-पाठ से पहले अपने पाठ/गुरु-परम्परा से अस्पष्ट अंश की पुष्टि करें।"]},
+ {title:"स्वस्तिवाचन",kind:"मंत्र एवं क्रिया",status:"पुस्तक-फोटो से पठनीय",body:"हाथ में अक्षत-पुष्प लेकर स्वस्तिवाचन करें।",mantra:"ॐ स्वस्ति न इन्द्रो वृद्धश्रवाः। स्वस्ति नः पूषा विश्ववेदाः।\nस्वस्ति नस्तार्क्ष्यो अरिष्टनेमिः। स्वस्ति नो बृहस्पतिर्दधातु॥",meaning:"इन्द्र, पूषा, अरिष्टनेमि और बृहस्पति से कल्याण एवं मंगल की प्रार्थना की जाती है।",tasks:["उपस्थित लोगों को अक्षत-पुष्प दें।","स्वस्तिवाचन का पाठ कराएँ।"]},
+ {title:"शान्तिपाठ",kind:"मंत्र",status:"फोटो से आंशिक पठनीय",body:"अगले पृष्ठ पर शान्तिपाठ के कई वैदिक मंत्र हैं। फोटो में कुछ पंक्तियाँ स्पष्ट नहीं हैं, इसलिए इस स्क्रीन पर केवल चरण का संकेत रखा गया है।",tasks:["पुस्तक के पृष्ठ से शान्तिपाठ का पूरा पाठ करें।","अस्पष्ट पंक्तियों को स्पष्ट प्रति/आचार्य-पाठ से मिलाएँ।"]},
+ {title:"श्रीगणेश वन्दना",kind:"मंत्र एवं क्रिया",status:"पाठ मिलान आवश्यक",body:"पुस्तक के अगले पृष्ठ पर गणेश-वन्दना के श्लोक हैं। प्रथम श्लोक का आरम्भ स्पष्ट है; शेष पाठ को पुस्तक से देखकर पढ़ें।",mantra:"ॐ सुमुखश्चैकदन्तश्च कपिलो गजकर्णकः।\nलम्बोदरश्च विकटो विघ्ननाशो विनायकः॥",meaning:"श्रीगणेश के मंगलमय स्वरूप का स्मरण कर विघ्नों की निवृत्ति की प्रार्थना की जाती है।",tasks:["अक्षत-पुष्प से गणेश-वन्दना करें।","पूरे स्तोत्र का पाठ पुस्तक से मिलाकर करें।"]},
+ {title:"संकल्प",kind:"संकल्प",status:"नाम/गोत्र भरना होगा",body:"पुस्तक के अनुसार हाथ में जल, अक्षत और फल लेकर देश-काल, गोत्र, नाम तथा कन्या के सम्बन्ध का उल्लेख करते हुए वर-वरण का संकल्प करें। नीचे दिया प्रारूप केवल भरने योग्य ढाँचा है; संवत्सर, मास, पक्ष, तिथि आदि वास्तविक पंचांग के अनुसार भरें।",mantra:"देशकालौ स्मृत्वा — अमुक गोत्रः अमुक शर्मा अहम्, अमुक गोत्रायाः अमुक नाम्न्याः कन्यायाः (वा कन्यायाः) भविष्यद्विवाहकर्मणि वरपूजनपूर्वकं वरवरणं करिष्ये।",meaning:"मैं अमुक गोत्र/नाम वाला, अमुक कन्या के विवाह-कर्म में वर-पूजनपूर्वक वर-वरण करने का संकल्प करता हूँ।",tasks:["यजमान/कन्या-पिता का नाम और गोत्र पूछें।","कन्या का नाम और गोत्र सही सुनिश्चत करें।","पंचांग के अनुसार देश-काल के विवरण भरें।","हाथ में जल, अक्षत और फल लेकर संकल्प कराएँ।"]},
+ {title:"गणेशादि देवताओं का पूजन",kind:"क्रिया",status:"पुस्तक के निर्देश से",body:"संकल्प के बाद कन्या का भाई अथवा पिता गणेशादि देवताओं का पूजन करे; इसके बाद वर-पूजन कराया जाए। विस्तृत आवाहन/षोडशोपचार मंत्र संबंधित स्वतंत्र पूजन-विधि के अनुसार लिए जाएँ।",tasks:["गणेशादि देवताओं का पूजन कराएँ।","पूजन पूर्ण होने पर वर-पूजन की तैयारी करें।"]},
+ {title:"वर-पूजन",kind:"क्रिया",status:"संक्षिप्त निर्देश",body:"पुस्तक में संकल्प के बाद गणेशादि देवताओं के पूजन और फिर वर-पूजन कराने का निर्देश है। वर-पूजन की विस्तृत स्वतंत्र सामग्री/मंत्र को इसी चरण में तभी जोड़ा जाएगा जब उसका संबंधित पृष्ठ उपलब्ध/सत्यापित हो।",tasks:["वर के पूजन हेतु तिलक, अक्षत, पुष्प, माला आदि स्थानीय विधानानुसार रखें।","कन्या पक्ष के प्रतिनिधि से पूजन कराएँ।"]},
+ {title:"फलदान",kind:"मंत्र एवं क्रिया",status:"पुस्तक-फोटो से पठनीय",body:"हाथ में फलदान की सामग्री लेकर फलदान चढ़ाने वाला व्यक्ति मंत्र पढ़े और सामग्री वर को अर्पित करे।",mantra:"ॐ वाचा दत्ता मया कन्या पुत्रार्थं स्वीकृतं त्वया।\nकन्यावलोकनविधौ निश्चितस्त्वं सुखी भव॥",meaning:"कन्या के पिता/दाता द्वारा वचनपूर्वक कन्या देने और वर से उसे स्वीकार करने की मंगलकामना व्यक्त होती है।",tasks:["फलदान की सामग्री हाथ में दें।","कन्या पक्ष का दाता मंत्र पढ़कर सामग्री वर को अर्पित करे।"]},
+ {title:"वर का प्रत्युत्तर",kind:"मंत्र एवं क्रिया",status:"पुस्तक-फोटो से पठनीय",body:"फलदान स्वीकार करके वर पुस्तक में दिया प्रत्युत्तर-मंत्र पढ़ता है।",mantra:"वाचा दत्ता त्वया कन्या पुत्रार्थं स्वीकृतं मया।\nवरावलोकनविधौ निश्चितस्त्वं सुखी भव॥",meaning:"वर वचनपूर्वक दिए गए प्रस्ताव को स्वीकार करने का उत्तर देता है।",tasks:["वर फलदान सामग्री स्वीकार करे।","वर प्रत्युत्तर-मंत्र पढ़े।"]},
+ {title:"फलदान सामग्री अर्पण एवं मंगल-स्मरण",kind:"क्रिया",status:"पुस्तक-फोटो से",body:"पुस्तक के अनुसार फलदान सामग्री को वर के हाथ में देने के बाद माथे पर लगाया जाता है और भगवान का ध्यान किया जाता है। इसके साथ विष्णु-स्मरण के मंत्र दिए हैं।",mantra:"प्रभातकाले कुर्वतां कर्म प्रत्यवेताध्वरेषु यत्।\nस्मरणादेव तद्विष्णुः परिपूर्णं स्वापदिति श्रुतिः॥\n\nश्री विष्णवे नमः। श्री विष्णवे नमः। श्री विष्णवे नमः॥",meaning:"भगवान विष्णु के स्मरण से कर्म की पूर्णता और मंगल की भावना की जाती है।",tasks:["फलदान सामग्री वर के हाथ में दें।","परम्परा के अनुसार सामग्री माथे से स्पर्श कराएँ।","विष्णु-स्मरण करें।"]},
+ {title:"गुरुजनों का आशीर्वाद एवं दक्षिणा",kind:"समापन",status:"पुस्तक-फोटो से",body:"अंत में वर अपने माता-पिता, आचार्य, पुरोहित आदि गुरुजनों के चरण स्पर्श करे। पुस्तक में ब्राह्मण को दक्षिणा तथा उपस्थित लोगों को इच्छानुसार यथोचित भेंट देने का उल्लेख है।",tasks:["वर से माता-पिता एवं गुरुजनों का चरण-स्पर्श कराएँ।","ब्राह्मण/पुरोहित को यथोचित दक्षिणा दें।","विधि पूर्ण होने की पुष्टि करें।"]}
+];
+function renderVarVaranam(){
+ const root=document.getElementById('detailBody');
+ const saved=JSON.parse(localStorage.getItem('vv_varanam_done')||'[]');
+ const done=saved.length;
+ let out=`<div class="ritual-intro"><b>वर वरणम् (वरिच्छा)</b><br>पुस्तक के उपलब्ध पृष्ठों और ऑनलाइन पुस्तक-विवरण के आधार पर तैयार संचालन प्रारूप। यह स्थानीय उत्तर भारतीय पद्धति का कार्य-क्रम है; कुलाचार/गुरु-परम्परा के अनुसार आचार्य अंतिम निर्णय लें।<div class="step-meta">प्रगति: ${done} / ${varVaranamSteps.length} चरण</div><div class="progress-wrap"><div class="progress-bar" id="vvProgress" style="width:${done/varVaranamSteps.length*100}%"></div></div><button class="secondary" onclick="resetVarVaranam()">प्रगति रीसेट करें</button></div>`;
+ varVaranamSteps.forEach((s,i)=>{
+  const isDone=saved.includes(i);
+  out+=`<article class="step-card"><div class="step-head"><span class="step-index">${i+1}</span><h3>${s.title}</h3><span class="status ${s.status.includes('आवश्यक')||s.status.includes('आंशिक')||s.status.includes('मिलान')?'review':''}">${s.status}</span></div><div class="step-body"><div class="step-meta">${s.kind}</div><p>${s.body}</p>${s.mantra?`<div class="mantra">${s.mantra}</div>`:''}${s.meaning?`<p><b>सरल अर्थ:</b> ${s.meaning}</p>`:''}${s.tasks?'<b>आचार्य के कार्य:</b><ul>'+s.tasks.map(t=>`<li>${t}</li>`).join('')+'</ul>':''}<label class="checkline"><input type="checkbox" onchange="updateVarStep(${i},this)" ${isDone?'checked':''}><b>यह चरण पूर्ण हुआ</b></label><div class="step-meta">मंत्र-पाठ: स्थिति के अनुसार मूल पुस्तक/परम्परा से मिलान करें।</div></div></article>`;
+ });
+ out+=`<div class="source-note">स्रोत/सत्यापन: आपकी भेजी हुई पुस्तक की तस्वीरें (वर वरणम् के पृष्ठ); पुस्तक का ऑनलाइन विवरण एवं अनुक्रम <a href="https://prayog.pustak.org/index.php/books/bookdetails/15339" target="_blank" rel="noopener">सरल विवाह संस्कार पद्धति — पं. देव नारायण शास्त्री</a>। ऑनलाइन पृष्ठ पुस्तक की पहचान और अनुक्रम की पुष्टि करता है; हर मंत्र का पूर्ण पाठ नहीं। जिन मंत्रों पर “मिलान आवश्यक” लिखा है, उन्हें अंतिम पाठ न मानें।</div>`;
+ root.innerHTML=out;
+}
+function updateVarStep(i,el){
+ let saved=JSON.parse(localStorage.getItem('vv_varanam_done')||'[]');
+ if(el.checked&&!saved.includes(i))saved.push(i);
+ if(!el.checked)saved=saved.filter(x=>x!==i);
+ localStorage.setItem('vv_varanam_done',JSON.stringify(saved));
+ renderVarVaranam();
+}
+function resetVarVaranam(){localStorage.removeItem('vv_varanam_done');renderVarVaranam();}
+
+function openRitual(i){current=i;document.getElementById('home').style.display='none';document.getElementById('modeView').classList.remove('active');document.getElementById('detail').classList.add('active');document.getElementById('detailTitle').textContent=rituals[i];document.getElementById('detailSub').textContent=`विषय ${i+1} / ${rituals.length} · पूर्ण विधि`;if(i===1){renderVarVaranam()}else{document.getElementById('detailBody').innerHTML='<div class="placeholder">इस संस्कार की पुस्तक-आधारित विधि अगले चरण में जोड़ी जाएगी।</div>';}window.scrollTo(0,0)}
 function nextRitual(){openRitual((current+1)%rituals.length)}
 function openMode(m){let data={live:['Live विवाह संचालन','विवाह शुरू करने पर आचार्य और सहायक के निर्देश, वर्तमान चरण, पिछला/अगला चरण तथा पूर्णता की स्थिति दिखाई जाएगी।'],acharya:['आचार्य मोड','मूल संस्कृत मंत्र, हिंदी अर्थ, विनियोग, पूरी विधि और किस व्यक्ति को क्या करना है—सब एक स्क्रीन पर।'],helper:['सहायक मोड','सहायक को केवल तैयारी, सामग्री और अगले कार्य के स्पष्ट निर्देश दिखेंगे।'],materials:['पूजन सामग्री','प्रत्येक संस्कार की अलग सामग्री सूची और पूरी विवाह सामग्री की संयुक्त सूची।'],records:['विवाह रिकॉर्ड','विवाह का नाम/दिनांक और पूर्णता की स्थिति इस डिवाइस पर स्थानीय रूप से सुरक्षित रखने की सुविधा।']}[m];document.getElementById('home').style.display='none';document.getElementById('detail').classList.remove('active');document.getElementById('modeView').classList.add('active');document.getElementById('modeTitle').textContent=data[0];document.getElementById('modeText').textContent=data[1];window.scrollTo(0,0)}
 function goHome(){document.getElementById('detail').classList.remove('active');document.getElementById('modeView').classList.remove('active');document.getElementById('home').style.display='block';window.scrollTo(0,0)}
