@@ -75,6 +75,18 @@ body.dark .live-toolbar select{background:var(--panel);color:var(--ink);border-c
 .acharya-step-body ul{padding-left:22px}
 body.dark .acharya-toolbar select{background:var(--panel);color:var(--ink);border-color:var(--line)}
 
+
+.helper-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.helper-toolbar select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:inherit;min-width:min(100%,320px)}
+.helper-section{border:1px solid var(--line);background:var(--panel);border-radius:14px;margin:12px 0;overflow:hidden}
+.helper-section h3{margin:0;padding:13px 15px;background:var(--soft);font-size:16px}
+.helper-section-body{padding:14px 15px}
+.helper-task{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);line-height:1.7}
+.helper-task:last-child{border-bottom:0}
+.helper-task input{margin-top:6px;accent-color:var(--accent)}
+.helper-empty{padding:14px;background:var(--soft);border-radius:10px;line-height:1.7}
+body.dark .helper-toolbar select{background:var(--panel);color:var(--ink);border-color:var(--line)}
+
 </style>
 </head>
 <body>
@@ -478,6 +490,38 @@ function acharyaToggleStep(i,checked){
  liveSetSaved(r,a);renderAcharya();
 }
 
+
+function helperRead(){try{return JSON.parse(localStorage.getItem("vv_helper_tasks_v1")||"{}")}catch(e){return {}}}
+function helperWrite(v){localStorage.setItem("vv_helper_tasks_v1",JSON.stringify(v))}
+function renderHelper(){
+ const root=document.getElementById("modeContent");
+ const idx=window.helperRitualIndex||0, r=liveRituals[idx];
+ if(!r||!r.steps){root.innerHTML="<p>इस संस्कार की कार्य-सूची उपलब्ध नहीं है।</p>";return}
+ const saved=helperRead();
+ let all=0,done=0, out=`<div class="helper-toolbar">
+ <label for="helperRitualSelect"><b>संस्कार चुनें:</b></label>
+ <select id="helperRitualSelect" onchange="changeHelperRitual(this.value)">
+ ${liveRituals.map((x,i)=>`<option value="${i}" ${i===idx?"selected":""}>${i+1}. ${x.name}</option>`).join("")}
+ </select></div>
+ <p class="hint">यहाँ प्रत्येक चरण में दिए गए कार्य निर्देश उसी क्रम में दिखाए गए हैं। सहायक केवल अपने निर्देशित कार्य करें; मंत्र-पाठ और संकल्प आचार्य के निर्देशन में होंगे।</p>`;
+ r.steps.forEach((st,si)=>{
+   const tasks=[...(st.tasks||[]),...(st.tasksExtra||[])];
+   if(!tasks.length)return;
+   out+=`<section class="helper-section"><h3>${si+1}. ${st.title||"चरण"}</h3><div class="helper-section-body">`;
+   tasks.forEach((task,ti)=>{
+     const key=`${idx}_${si}_${ti}`, checked=!!saved[key];
+     all++; if(checked)done++;
+     out+=`<label class="helper-task"><input type="checkbox" ${checked?"checked":""} onchange="helperToggle('${key}',this.checked)"><span>${task}</span></label>`;
+   });
+   out+="</div></section>";
+ });
+ if(!all)out+=`<div class="helper-empty">इस संस्कार के चरणों में अलग कार्य-सूची उपलब्ध नहीं है। कोई नया कार्य अनुमान से नहीं जोड़ा गया है।</div>`;
+ root.innerHTML=`<div class="step-meta">सहायक कार्य प्रगति: ${done} / ${all}</div><div class="progress-wrap"><div class="progress-bar" style="width:${all?Math.round(done/all*100):0}%"></div></div>`+out+
+ `<p class="source-note">सहायक की चेकलिस्ट इसी डिवाइस में सुरक्षित रहती है। संस्कार के मूल चरणों की पूर्णता Live विवाह संचालन/आचार्य मोड की साझा प्रगति से अलग है।</p>`;
+}
+function changeHelperRitual(v){window.helperRitualIndex=Number(v)||0;renderHelper()}
+function helperToggle(key,checked){const a=helperRead();if(checked)a[key]=true;else delete a[key];helperWrite(a);renderHelper()}
+
 function openMode(m){
  let data={live:['Live विवाह संचालन','विवाह को क्रमशः संचालित करें। संस्कार चुनें, वर्तमान चरण पढ़ें, कार्य-विभाजन देखें और पूर्णता दर्ज करें।'],acharya:['आचार्य मोड','मूल संस्कृत मंत्र, हिंदी अर्थ, विनियोग, पूरी विधि और किस व्यक्ति को क्या करना है—सब एक स्क्रीन पर।'],helper:['सहायक मोड','सहायक को केवल तैयारी, सामग्री और अगले कार्य के स्पष्ट निर्देश दिखेंगे।'],materials:['पूजन सामग्री','प्रत्येक संस्कार की अलग सामग्री सूची और पूरी विवाह सामग्री की संयुक्त सूची।'],records:['विवाह रिकॉर्ड','विवाह का नाम/दिनांक और पूर्णता की स्थिति इस डिवाइस पर स्थानीय रूप से सुरक्षित रखने की सुविधा।']}[m];
  document.getElementById('home').style.display='none';
@@ -488,6 +532,7 @@ function openMode(m){
  const content=document.getElementById('modeContent');
  if(m==='live'){liveRitualIndex=0;liveStepIndex=0;renderLive();}
  else if(m==='acharya'){window.acharyaRitualIndex=0;renderAcharya();}
+ else if(m==='helper'){window.helperRitualIndex=0;renderHelper();}
  else {content.className='placeholder';content.textContent='इस मॉड्यूल की कार्यशील सुविधाएँ अगले चरण में जोड़ी जाएँगी।';}
  window.scrollTo(0,0)
 }
